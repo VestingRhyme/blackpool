@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Players</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Players</h1>
+
+        <!-- Navigation dropdown -->
+        <div class="dropdown">
+            <button class="dropbtn">Navigate</button>
+            <div class="dropdown-content">
+                <a href="clubs.html">Clubs</a>
+                <a href="ranking.html">Ranking</a>
+                <a href="players.html">Players</a>
+                <a href="tournaments.html">Tournaments</a>
+                <a href="fixture.html">Fixtures</a>
+            </div>
+        </div>
+
+        <!-- Search bar to filter players -->
+        <input type="text" id="searchInput" placeholder="Search for players...">
+
+        <!-- Player list -->
+        <table id="playersTable">
+            <thead>
+                <tr>
+                    <th>Player Name</th>
+                    <th>Club</th>
+                </tr>
+            </thead>
+            <tbody id="playersTableBody">
+                <!-- Players data will be dynamically added here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Function to load players in alphabetical order
+            function loadPlayers() {
+                const playersTableBody = document.getElementById('playersTableBody');
+                const players = JSON.parse(localStorage.getItem('players')) || [];
+
+                // Sort players alphabetically by name
+                players.sort((a, b) => a.name.localeCompare(b.name));
+
+                // Clear existing rows
+                playersTableBody.innerHTML = '';
+
+                if (players.length === 0) {
+                    playersTableBody.innerHTML = '<tr><td colspan="2">No players found.</td></tr>';
+                    return;
+                }
+
+                // Append players to the table
+                players.forEach(player => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><a href="profile.html?player=${encodeURIComponent(player.name)}">${player.name}</a></td>
+                        <td>${player.club || 'No Club'}</td>
+                    `;
+                    playersTableBody.appendChild(row);
+                });
+            }
+
+            // Search functionality to filter players
+            document.getElementById('searchInput').addEventListener('keyup', function () {
+                const searchValue = this.value.toLowerCase();
+                const rows = document.querySelectorAll('#playersTableBody tr');
+
+                rows.forEach(row => {
+                    const playerName = row.querySelector('td').textContent.toLowerCase();
+                    if (playerName.includes(searchValue)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+
+            // Load players on page load
+            loadPlayers();
+        });
+    </script>
+</body>
+</html>
