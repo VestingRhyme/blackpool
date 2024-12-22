@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tournament Profile</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Override link colors for matches */
+        #tournamentMatches a, #finaleSection a {
+            color: black;
+            text-decoration: none;
+        }
+        #tournamentMatches a:hover, #finaleSection a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 id="tournamentName"></h1>
+        <a href="tournaments.html" style="position: relative; top: -80px; left: 10px; text-decoration: none; font-size: 16px; font-weight: bold;">Back</a>
+        <p><strong>Location:</strong> <span id="tournamentLocation"></span></p>
+        <p><strong>Date:</strong> <span id="tournamentDate"></span></p>
+
+        <!-- Tabs Navigation -->
+        <div class="tabs">
+            <button class="tab-link active" data-tab="overview">Overview</button>
+            <button class="tab-link" data-tab="players">Players</button>
+            <button class="tab-link" data-tab="matches">Matches</button>
+            <button class="tab-link" data-tab="draws">Draws</button>
+        </div>
+
+        <!-- Tab Content -->
+        <div id="overview" class="tab-content active">
+            <h2>Overview</h2>
+            <p id="tournamentOverview">No overview available.</p>
+        </div>
+
+        <div id="players" class="tab-content">
+            <h2>Players</h2>
+            <input type="text" id="playerSearchBar" placeholder="Search for a player">
+            <ul id="tournamentPlayers" style="display: flex; flex-wrap: wrap; gap: 10px;"></ul>
+        </div>
+
+        <div id="matches" class="tab-content">
+            <h2>Matches</h2>
+            <input type="text" id="matchSearchBar" placeholder="Search by player matches">
+            <div id="finaleSection" style="display: none; text-align: center; margin-bottom: 20px;">
+                <h3>Finale</h3>
+                <p id="finalePlayers"></p>
+            </div>
+
+            <ul id="tournamentMatches"></ul>
+        </div>
+
+        <div id="draws" class="tab-content">
+            <h2>Draws</h2>
+            <ul id="tournamentDraws"></ul>
+        </div>
+
+        <!-- Modal for Player Matches -->
+        <div id="playerMatchesModal" class="modal" style="display:none;">
+            <div class="modal-content">
+                <span class="close-button">&times;</span>
+                <h2 id="playerNameHeader">Matches</h2>
+                <h3>Upcoming Matches</h3>
+                <ul id="upcomingMatchesList"></ul>
+                <h3>Past Matches</h3>
+                <ul id="pastMatchesList"></ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const tournaments = JSON.parse(localStorage.getItem('tournaments')) || [];
+            const tournamentName = new URLSearchParams(window.location.search).get('tournament');
+            const tournament = tournaments.find(t => t.name === tournamentName) || { players: [], matches: [], seeds: [], draws: [], finale: null, publishedFinale: false };
+
+            const playerSearchBar = document.getElementById('playerSearchBar');
+            const playersList = document.getElementById('tournamentPlayers');
+
+            const matchSearchBar = document.getElementById('matchSearchBar');
+            const matchesList = document.getElementById('tournamentMatches');
+            const drawsList = document.getElementById('tournamentDraws');
+
+            const tabLinks = document.querySelectorAll('.tab-link');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            // Populate tournament details
+            document.getElementById('tournamentName').textContent = tournamentName || 'Tournament';
+            document.getElementById('tournamentLocation').textContent = tournament.location || 'Unknown';
+            document.getElementById('tournamentDate').textContent = tournament.date || 'Unknown';
+            document.getElementById('tournamentOverview').textContent = tournament.overview || 'No overview available.';
+
+            // Populate players, sorted by last name
+            function displayPlayers(filter = '') {
+                playersList.innerHTML = '';
+                const sortedPlayers = tournament.players.slice().sort((a, b) => {
+                    const lastNameA = a.split(' ').pop().toLowerCase();
+                    const lastNameB = b.split(' ').pop().toLowerCase();
+                    return lastNameA.localeCompare(lastNameB);
+                });
+
+                const filteredPlayers = sortedPlayers.filter(player =>
+                    player.toLowerCase().includes(filter.toLowerCase())
+                );
+
+                filteredPlayers.forEach((player) => {
+                    const listItem = document.createElement('li');
+                    listItem.style.listStyle = 'none';
+                    listItem.style.width = 'calc(50% - 10px)';
+                    const playerLink = document.createElement('a');
+                    playerLink.href = `profile.html?player=${encodeURIComponent(player)}`;
+                    playerLink.textContent = player;
+                    playerLink.target = '_blank';
+                    listItem.appendChild(playerLink);
+                    playersList.appendChild(listItem);
+                });
+            }
+
+            // Populate draws
+            function displayDraws() {
+                drawsList.innerHTML = '';
+                tournament.draws.forEach(draw => {
+                    const listItem = document.createElement('li');
+                    const drawLink = document.createElement('a');
+                    drawLink.href = `draw-profile.html?draw=${encodeURIComponent(draw.name)}&tournament=${encodeURIComponent(tournamentName)}`;
+                    drawLink.textContent = draw.name;
+                    drawLink.target = '_blank';
+                    listItem.appendChild(drawLink);
+                    drawsList.appendChild(listItem);
+                });
+            }
+
+            function displayFinale() {
+                const finaleSection = document.getElementById('finaleSection');
+                if (tournament.publishedFinale && tournament.finale) {
+                    const finalePlayers = document.getElementById('finalePlayers');
+                    const score = tournament.finale.score;
+
+                    if (!score) {
+                        // No score, display only player names with larger font
+                        finalePlayers.innerHTML = `
+                            <span style="font-size: 1.5em; font-weight: bold;">
+                                <a href="profile.html?player=${encodeURIComponent(tournament.finale.player1)}" target="_blank">${tournament.finale.player1}</a> 
+                                vs 
+                                <a href="profile.html?player=${encodeURIComponent(tournament.finale.player2)}" target="_blank">${tournament.finale.player2}</a>
+                            </span>
+                        `;
+                    } else {
+                        // Score exists, display players with the score below
+                        finalePlayers.innerHTML = `
+                            <span style="font-size: 1.5em; font-weight: bold;">
+                                <a href="profile.html?player=${encodeURIComponent(tournament.finale.player1)}" target="_blank">${tournament.finale.player1}</a> 
+                                vs 
+                                <a href="profile.html?player=${encodeURIComponent(tournament.finale.player2)}" target="_blank">${tournament.finale.player2}</a>
+                            </span>
+                            <br>
+                            <strong>Score:</strong> ${score}
+                        `;
+                    }
+                    finaleSection.style.display = 'block';
+                } else {
+                    finaleSection.style.display = 'none';
+                }
+            }
+
+
+            // Aggregate matches with handicaps
+            const aggregatedMatches = [];
+            if (tournament.draws && tournament.draws.length > 0) {
+                tournament.draws.forEach(draw => {
+                    draw.matches.forEach(match => {
+                        aggregatedMatches.push({
+                            team1: match.team1,
+                            team2: match.team2,
+                            handicap1: tournament.seeds[tournament.players.indexOf(match.team1)] || 'N/A',
+                            handicap2: tournament.seeds[tournament.players.indexOf(match.team2)] || 'N/A',
+                            score: match.score || '',
+                            drawName: draw.name
+                        });
+                    });
+                });
+            }
+
+            // Display matches with handicaps
+            function displayMatches(filter = '') {
+                matchesList.innerHTML = '';
+
+                const filteredMatches = aggregatedMatches.filter(match => {
+                    const searchTerm = filter.toLowerCase();
+                    return (
+                        !searchTerm ||
+                        match.team1.toLowerCase().includes(searchTerm) ||
+                        match.team2.toLowerCase().includes(searchTerm)
+                    );
+                });
+
+                if (filteredMatches.length > 0) {
+                    filteredMatches.forEach(match => {
+                        const listItem = document.createElement('li');
+                        listItem.innerHTML = `
+                            <strong>Draw:</strong> ${match.drawName} <br>
+                            <strong>Teams:</strong> 
+                                <a href="profile.html?player=${encodeURIComponent(match.team1)}" target="_blank">${match.team1}</a> 
+                                (${match.handicap1}) vs 
+                                <a href="profile.html?player=${encodeURIComponent(match.team2)}" target="_blank">${match.team2}</a> 
+                                (${match.handicap2}) <br>
+                            <strong>Score:</strong> ${match.score || ''}
+                        `;
+                        matchesList.appendChild(listItem);
+                    });
+                } else {
+                    matchesList.innerHTML = '<p>No matches found.</p>';
+                }
+            }
+
+            // Handle tab switching
+            tabLinks.forEach(link => {
+                link.addEventListener('click', function () {
+                    tabLinks.forEach(tab => tab.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+
+                    this.classList.add('active');
+                    const targetTab = document.querySelector(`#${this.getAttribute('data-tab')}`);
+                    if (targetTab) targetTab.classList.add('active');
+                });
+            });
+
+            // Initial rendering
+            displayPlayers();
+            displayDraws();
+            displayMatches();
+            displayFinale();
+
+            // Attach search functionality
+            playerSearchBar.addEventListener('input', (e) => {
+                displayPlayers(e.target.value);
+            });
+
+            matchSearchBar.addEventListener('input', (e) => {
+                displayMatches(e.target.value);
+            });
+        });
+    </script>
+</body>
+</html>

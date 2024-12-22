@@ -1,0 +1,272 @@
+<html lang="en">
+<head>
+
+    <!-- Ensure jQuery is loaded before any scripts -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/js/standalone/selectize.min.js"></script>
+
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Manage Players</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Admin Panel - Manage Players</h1>
+        
+        <form id="addPlayerForm">
+            <label for="playerNameInput">Player Name:</label>
+            <input type="text" id="playerNameInput" placeholder="Enter Player Name" required>
+        
+            <label for="clubSelect">Assign to Club:</label>
+            <select id="clubSelect" required>
+                <!-- Club options will be dynamically loaded here -->
+            </select>
+        
+            <button type="submit" id="addPlayerButton">Add Player</button>
+        </form>                   
+
+        <script>
+            // When adding a new player, ensure gender is stored
+            const playerName = document.getElementById('playerNameInput').value.trim();
+            const selectedClub = document.getElementById('clubSelect').value.trim();
+            const selectedGender = document.getElementById('genderSelect').value.trim();
+
+            const newPlayer = {
+                name: playerName,
+                club: selectedClub,
+                gender: selectedGender, // Store the gender
+                totalGames: 0,
+                gamesWon: 0,
+                winPercentage: 0
+            };
+
+            players.push(newPlayer);
+            localStorage.setItem('players', JSON.stringify(players));
+
+        </script>
+
+        <div id="playerList">
+            <!-- List of players will be dynamically added here -->
+        </div>
+        
+        <h2>Player List</h2>
+        <table id="leaderboardTotal" class="leaderboardTable">
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Player Name</th>
+                    <th>Total Games</th>
+                    <th>Games Won</th>
+                    <th>Win Percentage</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="playerTableBodyTotal">
+                <!-- Player data will be injected here -->
+            </tbody>
+        </table>
+
+        
+        
+        <h3>Add/Edit Game</h3>
+        <form id="leagueGameForm">
+            <label for="round">Round:</label>
+            <input type="text" id="round" name="round" required>
+            
+            <label for="team1Player1">Team 1 Player 1:</label>
+            <input type="text" id="team1Player1" name="team1Player1" required>
+            
+            <label for="team1Player2">Team 1 Player 2:</label>
+            <input type="text" id="team1Player2" name="team1Player2" required>
+            
+            <label for="team1Scores">Team 1 Scores:</label>
+            <input type="text" id="team1Scores" name="team1Scores" required>
+            
+            <label for="team2Player1">Team 2 Player 1:</label>
+            <input type="text" id="team2Player1" name="team2Player1" required>
+            
+            <label for="team2Player2">Team 2 Player 2:</label>
+            <input type="text" id="team2Player2" name="team2Player2" required>
+            
+            <label for="team2Scores">Team 2 Scores:</label>
+            <input type="text" id="team2Scores" name="team2Scores" required>
+            
+            <label for="date">Date:</label>
+            <input type="date" id="date" name="date" required>
+            
+            <label for="location">Location:</label>
+            <input type="text" id="location" name="location" required>
+            
+            <button type="submit">Add Game</button>
+        </form>         
+
+        <h2>Edit Player's League Matches</h2>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.default.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/js/standalone/selectize.min.js"></script>
+        <script>
+            $('#editPlayerSelect').selectize({
+                create: false,
+                sortField: 'text'
+            });
+        </script>        
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+        
+        <select id="editPlayerSelect">
+            <!-- Player options will be dynamically loaded -->
+        </select>
+        
+        <script>
+            $('#editPlayerSelect').selectize({
+                create: false,
+                sortField: 'text'
+            });
+        </script>
+        
+        <div id="playerMatchesSection" style="display: none;">  <!-- Display this section when a player is selected -->
+            <div id="playerMatchesList">  <!-- Matches will be loaded here dynamically -->
+                <!-- Matches will be injected here -->
+            </div>
+        </div>            
+
+        <h1>Admin Panel - Manage Clubs</h1>
+
+        <div class="admin-section">
+            <h2>Edit Club</h2>
+        
+            <!-- Club selection dropdown -->
+            <label for="editClubSelect">Select Club:</label>
+            <select id="editClubSelect">
+                <option value="">-- Select a Club --</option>
+            </select>
+        
+            <form id="editClubForm" style="display: none;">
+                <label for="clubName">Club Name:</label>
+                <input type="text" id="clubName" name="clubName" required>
+            
+                <label for="clubOverview">Overview:</label>
+                <textarea id="clubOverview" name="clubOverview"></textarea>
+            
+                <label for="clubVenue">Venue:</label>
+                <input type="text" id="clubVenue" name="clubVenue">
+            
+                <label for="matchNight">Match Night:</label>
+                <input type="text" id="matchNight" name="matchNight" placeholder="e.g., Monday">
+            
+                <label for="startingTime">Starting Time:</label>
+                <input type="text" id="startingTime" name="startingTime" placeholder="e.g., 7:00 PM">
+            
+                <!-- Teams Section -->
+                <label for="teams">Teams:</label>
+                <div id="teamsSection">
+                    <input type="text" id="teamInput" placeholder="Enter team name" />
+                    <button type="button" id="addTeamButton">Add Team</button>
+                    <ul id="teamList"></ul>
+                </div>
+
+                <button type="button" id="saveClubButton">Save Changes</button>
+            </form>
+            
+        </div>
+        
+        <div>
+            <form id="addClubForm">
+                <label for="newClubNameInput">Club Name:</label>
+                <input type="text" id="newClubNameInput" placeholder="Enter Club Name" required>
+                <button type="submit">Add Club</button>
+            </form>
+            
+            <!-- Clubs Table -->
+            <table id="clubsTable" class="leaderboardTable">
+                <thead>
+                    <tr>
+                        <th>Club Name</th>
+                        <th>Number of Players</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="clubsTableBody">
+                    <!-- Clubs will be dynamically added here -->
+                </tbody>
+            </table>
+    
+        <script src="script.js"></script>
+        </div>
+
+        <div class="admin-section">
+            <h2>Manage Fixtures</h2>
+
+            <form id="fixtureForm">
+                <label for="fixtureDate">Date:</label>
+                <input type="date" id="fixtureDate" name="fixtureDate" required>
+            
+                <label for="homeTeam">Home Team:</label>
+                <select id="homeTeam" name="homeTeam" required>
+                    <!-- Club options will be loaded here -->
+                </select>
+            
+                <label for="awayTeam">Away Team:</label>
+                <select id="awayTeam" name="awayTeam" required>
+                    <!-- Club options will be loaded here -->
+                </select>
+            
+                <label for="venue">Venue:</label>
+                <input type="text" id="venue" name="venue" required readonly> <!-- Venue will be auto-filled -->
+            
+                <button type="button" id="addFixtureButton">Add Fixture</button>
+            </form>            
+            
+            <!-- Existing Fixtures List -->
+            <h3>Upcoming Fixtures</h3>
+            <table id="existingFixturesTable" class="leaderboardTable">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Home Team</th>
+                        <th>Away Team</th>
+                        <th>Venue</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="existingFixturesList"></tbody>
+            </table>            
+        </div>
+
+        <h2>Manage Tournaments</h2>
+        <form id="addTournamentForm">
+            <label for="tournamentName">Tournament Name:</label>
+            <input type="text" id="tournamentName" placeholder="Enter Tournament Name" required>
+        
+            <label for="tournamentLocation">Location:</label>
+            <input type="text" id="tournamentLocation" placeholder="Enter Location" required>
+        
+            <label for="tournamentDate">Date:</label>
+            <input type="date" id="tournamentDate" required>
+        
+            <button type="button" id="addTournamentButton">Add Tournament</button>
+        </form>
+        
+        <h3>Existing Tournaments</h3>
+
+        <!-- Display tournaments in a table with edit/delete options -->
+        <table id="adminTournamentsTable">
+            <thead>
+                <tr>
+                    <th>Tournament Name</th>
+                    <th>Location</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody id="adminTournamentsTableBody">
+                <!-- Tournament data will be injected here -->
+            </tbody>
+        </table>
+        
+    </div>
+    </html>
+    
+    <script src="script.js"></script>
+</body>
+</html>

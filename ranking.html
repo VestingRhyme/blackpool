@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Player Leaderboard</h1>
+
+        <div class="dropdown">
+            <button class="dropbtn">Navigate</button>
+            <div class="dropdown-content">
+                <a href="clubs.html">Clubs</a>
+                <a href="ranking.html">Ranking</a>
+                <a href="players.html">Players</a>
+                <a href="tournaments.html">Tournaments</a>
+                <a href="fixture.html">Fixtures</a>
+            </div>
+        </div>
+        
+        <!-- Leaderboard Tables -->
+        <table id="leaderboardTotal" class="leaderboardTable">
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Player Name</th>
+                    <th>Total Games</th>
+                    <th>Games Won</th>
+                    <th>Win Percentage</th>
+                </tr>
+            </thead>
+            <tbody id="playerTableBodyTotal">
+                <!-- Player data will be injected here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script src="script.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    updateLeaderboard(); // Ensure leaderboard is loaded when Rankings page opens
+});
+</script>
+</body>
+</html>

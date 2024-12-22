@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Draw Admin Panel</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1 id="drawNameHeader">Draw Admin Panel</h1>
+        <p><strong>Tournament:</strong> <span id="tournamentName"></span></p>
+
+        <h2>Players in Draw</h2>
+        <input type="text" id="playerNameInput" placeholder="Add player to draw">
+        <button id="addPlayerButton">Add Player</button>
+        <ul id="drawPlayersList"></ul>
+
+        <h2>Round-Robin Matches</h2>
+        <table id="roundRobinTable">
+            <thead>
+                <tr>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+        <a href="tournament-admin.html" id="backToAdmin">Back to Tournament Admin</a>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const drawName = urlParams.get('draw');
+            const tournamentName = urlParams.get('tournament');
+
+            const tournaments = JSON.parse(localStorage.getItem('tournaments')) || [];
+            const tournament = tournaments.find(t => t.name === tournamentName);
+
+            if (!tournament || !drawName) {
+                alert('Invalid draw or tournament');
+                window.location.href = 'tournament-admin.html';
+                return;
+            }
+
+            const draw = tournament.draws.find(d => d.name === drawName);
+            if (!draw) {
+                alert('Draw not found');
+                window.location.href = 'tournament-admin.html';
+                return;
+            }
+
+            document.getElementById('drawNameHeader').textContent = `Draw Admin Panel: ${drawName}`;
+            document.getElementById('tournamentName').textContent = tournamentName;
+            document.getElementById('backToAdmin').href = `tournament-admin.html?tournament=${encodeURIComponent(tournamentName)}`;
+
+            const drawPlayersList = document.getElementById('drawPlayersList');
+            const playerNameInput = document.getElementById('playerNameInput');
+            const addPlayerButton = document.getElementById('addPlayerButton');
+            const roundRobinTable = document.getElementById('roundRobinTable');
+
+            function displayPlayers() {
+                drawPlayersList.innerHTML = '';
+                if (draw.players.length > 0) {
+                    draw.players.forEach((player, index) => {
+                        const listItem = document.createElement('li');
+
+                        const playerLink = document.createElement('a');
+                        playerLink.href = `profile.html?player=${encodeURIComponent(player)}`;
+                        playerLink.textContent = player;
+                        playerLink.target = '_blank';
+
+                        const deleteButton = document.createElement('button');
+                        deleteButton.textContent = 'Delete';
+                        deleteButton.dataset.index = index;
+
+                        listItem.appendChild(playerLink);
+                        listItem.appendChild(deleteButton);
+                        drawPlayersList.appendChild(listItem);
+
+                        // Attach delete functionality
+                        deleteButton.addEventListener('click', function () {
+                            draw.players.splice(index, 1);
+                            generateRoundRobinMatches();
+                            saveDrawChanges();
+                            displayPlayers();
+                        });
+                    });
+                } else {
+                    drawPlayersList.innerHTML = '<p>No players added to this draw yet.</p>';
+                }
+            }
+
+            function generateRoundRobinMatches() {
+                draw.matches = [];
+                draw.players.forEach((player, i) => {
+                    draw.players.forEach((opponent, j) => {
+                        if (i < j) { // Avoid duplicate match entries
+                            draw.matches.push({ team1: player, team2: opponent, score: null });
+                        }
+                    });
+                });
+
+                saveDrawChanges();
+                generateRoundRobin();
+            }
+
+            function generateRoundRobin() {
+                roundRobinTable.querySelector('thead tr').innerHTML = '<th></th>' + draw.players.map(p => `<th>${p}</th>`).join('');
+                roundRobinTable.querySelector('tbody').innerHTML = '';
+
+                draw.players.forEach((player, i) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `<th>${player}</th>` + draw.players.map((opponent, j) => {
+                        if (i === j) return '<td>-</td>';
+                        const match = draw.matches.find(m => (m.team1 === player && m.team2 === opponent) || (m.team1 === opponent && m.team2 === player));
+                        const matchScore = match ? match.score || 'Edit Score' : 'Edit Score';
+                        return `<td><button data-team1="${player}" data-team2="${opponent}">${matchScore}</button></td>`;
+                    }).join('');
+                    roundRobinTable.querySelector('tbody').appendChild(row);
+                });
+
+                // Attach event listeners for the Edit Score buttons
+                roundRobinTable.querySelectorAll('button').forEach(button => {
+                    button.addEventListener('click', function () {
+                        const team1 = this.dataset.team1;
+                        const team2 = this.dataset.team2;
+                        editScore(team1, team2);
+                    });
+                });
+            }
+
+            function editScore(team1, team2) {
+                const newScore = prompt(`Enter score for ${team1} vs ${team2}:`);
+                if (newScore) {
+                    let match = draw.matches.find(m => (m.team1 === team1 && m.team2 === team2) || (m.team1 === team2 && m.team2 === team1));
+                    if (!match) {
+                        match = { team1, team2, score: '' };
+                        draw.matches.push(match);
+                    }
+                    match.score = newScore;
+                    generateRoundRobin();
+                    saveDrawChanges();
+                }
+            }
+
+            function saveDrawChanges() {
+                const tournamentIndex = tournaments.findIndex(t => t.name === tournamentName);
+                if (tournamentIndex !== -1) {
+                    tournaments[tournamentIndex] = tournament;
+                    localStorage.setItem('tournaments', JSON.stringify(tournaments));
+                }
+            }
+
+            addPlayerButton.addEventListener('click', function () {
+                const playerName = playerNameInput.value.trim();
+                if (playerName && !draw.players.includes(playerName)) {
+                    draw.players.push(playerName);
+                    generateRoundRobinMatches();
+                    saveDrawChanges();
+                    displayPlayers();
+                    playerNameInput.value = '';
+                } else {
+                    alert('Player already exists or input is empty.');
+                }
+            });
+
+            displayPlayers();
+            generateRoundRobinMatches();
+        });
+    </script>
+</body>
+</html>

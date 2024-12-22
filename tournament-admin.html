@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Knockout Admin</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1 id="tournamentNameHeader">Tournament Admin Panel</h1>
+        <p><strong>Location:</strong> <input type="text" id="tournamentLocation" placeholder="Edit location"></p>
+        <p><strong>Date:</strong> <input type="date" id="tournamentDate" placeholder="Edit date"></p>
+
+        <h2>Overview</h2>
+        <textarea id="tournamentOverviewInput" placeholder="Edit tournament overview"></textarea>
+        <button id="saveOverviewButton">Save Changes</button>
+
+        <h2>Players</h2>
+        <input type="text" id="playerNameInput" placeholder="Add player name">
+        <button id="addPlayerButton">Add Player</button>
+        <ul id="tournamentPlayersList"></ul>
+
+        <h2>Seed Players</h2>
+        <form id="editSeedForm">
+            <label for="seedPlayerSelect">Select Player:</label>
+            <select id="seedPlayerSelect">
+                <option value="">-- Select Player --</option>
+            </select>
+            <label for="newSeedInput">Enter New Seed:</label>
+            <input type="number" id="newSeedInput" placeholder="Enter Seed">
+            <button type="submit">Update Seed</button>
+        </form>
+
+        <h2>Manage Draws</h2>
+        <form id="createDrawForm">
+            <label for="drawName">Draw Name:</label>
+            <input type="text" id="drawName" placeholder="Enter draw name">
+            <label for="drawPlayers">Select Players:</label>
+            <select id="drawPlayers" multiple></select>
+            <button type="submit">Create Draw</button>
+        </form>
+        <ul id="drawList"></ul>
+
+        <h2>Finale</h2>
+        <form id="createFinaleForm">
+            <label for="finalePlayer1">Player 1:</label>
+            <select id="finalePlayer1">
+                <option value="">-- Select Player --</option>
+            </select>
+            <label for="finalePlayer2">Player 2:</label>
+            <select id="finalePlayer2">
+                <option value="">-- Select Player --</option>
+            </select>
+            <label for="finaleScore">Finale Score:</label>
+            <input type="text" id="finaleScore" placeholder="Enter finale score">
+
+            <button type="submit">Create Finale</button>
+        </form>
+        <button id="publishFinaleButton">Publish Finale</button>
+        <button id="deleteFinaleButton">Delete Finale</button>
+
+        <div id="roundRobinSection" style="display:none;">
+            <h2 id="selectedDrawName"></h2>
+            <table id="roundRobinTable">
+                <thead>
+                    <tr>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const tournaments = JSON.parse(localStorage.getItem('tournaments')) || [];
+            const tournamentName = new URLSearchParams(window.location.search).get('tournament');
+            let tournament = tournaments.find(t => t.name === tournamentName) || { players: [], seeds: [], draws: [], finale: null, publishedFinale: false };
+
+            const playerNameInput = document.getElementById('playerNameInput');
+            const addPlayerButton = document.getElementById('addPlayerButton');
+            const tournamentPlayersList = document.getElementById('tournamentPlayersList');
+            const seedPlayerSelect = document.getElementById('seedPlayerSelect');
+            const newSeedInput = document.getElementById('newSeedInput');
+            const drawPlayersSelect = document.getElementById('drawPlayers');
+            const drawList = document.getElementById('drawList');
+            const drawNameInput = document.getElementById('drawName');
+            const finalePlayer1 = document.getElementById('finalePlayer1');
+            const finalePlayer2 = document.getElementById('finalePlayer2');
+            const createFinaleForm = document.getElementById('createFinaleForm');
+            const publishFinaleButton = document.getElementById('publishFinaleButton');
+            const deleteFinaleButton = document.getElementById('deleteFinaleButton');
+            const tournamentOverviewInput = document.getElementById('tournamentOverviewInput');
+            const saveOverviewButton = document.getElementById('saveOverviewButton');
+
+            function saveToLocalStorage() {
+                const index = tournaments.findIndex(t => t.name === tournamentName);
+                if (index === -1) {
+                    tournaments.push(tournament);
+                } else {
+                    tournaments[index] = tournament;
+                }
+                localStorage.setItem('tournaments', JSON.stringify(tournaments));
+            }
+
+            function populatePlayerDropdowns() {
+                seedPlayerSelect.innerHTML = '<option value="">-- Select Player --</option>';
+                drawPlayersSelect.innerHTML = '';
+                finalePlayer1.innerHTML = '<option value="">-- Select Player --</option>';
+                finalePlayer2.innerHTML = '<option value="">-- Select Player --</option>';
+                tournament.players.forEach(player => {
+                    const option = document.createElement('option');
+                    option.value = player;
+                    option.textContent = player;
+                    seedPlayerSelect.appendChild(option);
+
+                    const drawOption = document.createElement('option');
+                    drawOption.value = player;
+                    drawOption.textContent = player;
+                    drawPlayersSelect.appendChild(drawOption);
+
+                    const finaleOption1 = document.createElement('option');
+                    finaleOption1.value = player;
+                    finaleOption1.textContent = player;
+                    finalePlayer1.appendChild(finaleOption1);
+
+                    const finaleOption2 = document.createElement('option');
+                    finaleOption2.value = player;
+                    finaleOption2.textContent = player;
+                    finalePlayer2.appendChild(finaleOption2);
+                });
+            }
+
+            function displayPlayers() {
+                tournamentPlayersList.innerHTML = '';
+                tournament.players.forEach((player, index) => {
+                    const listItem = document.createElement('li');
+                    const playerLink = document.createElement('a');
+                    playerLink.href = `player-profile.html?player=${encodeURIComponent(player)}`;
+                    playerLink.textContent = player;
+                    playerLink.target = '_blank';
+
+                    const deleteButton = document.createElement('button');
+                    deleteButton.textContent = 'Delete';
+                    deleteButton.dataset.index = index;
+                    deleteButton.addEventListener('click', () => {
+                        tournament.players.splice(index, 1);
+                        populatePlayerDropdowns();
+                        displayPlayers();
+                        saveToLocalStorage();
+                    });
+
+                    listItem.appendChild(playerLink);
+                    listItem.appendChild(deleteButton);
+                    tournamentPlayersList.appendChild(listItem);
+                });
+            }
+
+            function displayDraws() {
+                drawList.innerHTML = '';
+                tournament.draws.forEach((draw, index) => {
+                    const listItem = document.createElement('li');
+                    const drawLink = document.createElement('a');
+                    drawLink.href = `draw-profile.html?draw=${encodeURIComponent(draw.name)}&tournament=${encodeURIComponent(tournamentName)}`;
+                    drawLink.textContent = draw.name;
+                    drawLink.target = '_blank';
+
+                    const deleteButton = document.createElement('button');
+                    deleteButton.textContent = 'Delete';
+                    deleteButton.dataset.index = index;
+                    deleteButton.addEventListener('click', () => {
+                        tournament.draws.splice(index, 1);
+                        displayDraws();
+                        saveToLocalStorage();
+                    });
+
+                    listItem.appendChild(drawLink);
+                    listItem.appendChild(deleteButton);
+                    drawList.appendChild(listItem);
+                });
+            }
+
+            saveOverviewButton.addEventListener('click', function () {
+                tournament.overview = tournamentOverviewInput.value;
+                saveToLocalStorage();
+                alert('Overview saved successfully!');
+            });
+
+            // Add Player Button Logic
+            addPlayerButton.addEventListener('click', function () {
+                const playerName = playerNameInput.value.trim();
+                if (!playerName) {
+                    alert('Player name cannot be empty.');
+                    return;
+                }
+                if (tournament.players.includes(playerName)) {
+                    alert('Player already exists.');
+                    return;
+                }
+                tournament.players.push(playerName);
+                playerNameInput.value = ''; // Clear input field
+                populatePlayerDropdowns();
+                displayPlayers();
+                saveToLocalStorage();
+                alert('Player added successfully!');
+            });
+
+            // Add Draw Form Logic
+            document.getElementById('createDrawForm').addEventListener('submit', function (e) {
+                e.preventDefault();
+                const drawName = drawNameInput.value.trim();
+                const selectedPlayers = Array.from(drawPlayersSelect.selectedOptions).map(opt => opt.value);
+
+                if (!drawName) {
+                    alert('Draw name cannot be empty.');
+                    return;
+                }
+                if (tournament.draws.some(draw => draw.name === drawName)) {
+                    alert('A draw with this name already exists.');
+                    return;
+                }
+                if (selectedPlayers.length === 0) {
+                    alert('Please select at least one player for the draw.');
+                    return;
+                }
+
+                const newDraw = {
+                    name: drawName,
+                    players: selectedPlayers,
+                    matches: []
+                };
+                tournament.draws.push(newDraw);
+                drawNameInput.value = ''; // Clear input field
+                displayDraws();
+                saveToLocalStorage();
+                alert('Draw created successfully!');
+            });
+
+            createFinaleForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+                const player1 = finalePlayer1.value;
+                const player2 = finalePlayer2.value;
+                const score = document.getElementById('finaleScore').value.trim();
+
+                if (!player1 || !player2 || player1 === player2) {
+                    alert('Please select two different players for the finale.');
+                    return;
+                }
+
+                tournament.finale = { player1, player2, score };
+                saveToLocalStorage();
+                alert('Finale created successfully!');
+            });
+
+            publishFinaleButton.addEventListener('click', function () {
+                if (!tournament.finale) {
+                    alert('Please create a finale first.');
+                    return;
+                }
+
+                tournament.publishedFinale = true;
+                saveToLocalStorage();
+                alert('Finale published successfully!');
+            });
+
+            deleteFinaleButton.addEventListener('click', function () {
+                if (!tournament.finale) {
+                    alert('No finale to delete.');
+                    return;
+                }
+
+                tournament.finale = null;
+                tournament.publishedFinale = false;
+                saveToLocalStorage();
+                alert('Finale deleted successfully!');
+            });
+
+            populatePlayerDropdowns();
+            displayPlayers();
+            displayDraws();
+        });
+    </script>
+</body>
+</html>

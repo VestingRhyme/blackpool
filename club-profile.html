@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Club Profile</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1 id="clubNameHeader">Club Name</h1>
+
+        <!-- Tabs Navigation -->
+        <div class="tabs">
+            <button class="tab-link active" data-tab="Overview">Overview</button>
+            <button class="tab-link" data-tab="Matches">Matches</button>
+            <button class="tab-link" data-tab="Players">Players</button>
+            <button class="tab-link" data-tab="Details">Details</button>
+        </div>
+
+        <!-- Tab Content -->
+        <div id="Overview" class="tab-content active">
+            <h2>Overview</h2>
+            <p id="clubOverviewText">Club Overview will be shown here.</p>
+        </div>
+
+        <div id="Matches" class="tab-content">
+            <h2>Matches</h2>
+            <ul id="clubMatchesList"></ul>
+        </div>
+
+        <div id="Players" class="tab-content">
+            <h2>Players in Club</h2>
+            <table id="clubPlayersTable" class="leaderboardTable">
+                <thead>
+                    <tr>
+                        <th>Player Name</th>
+                    </tr>
+                </thead>
+                <tbody id="clubPlayersList"></tbody>
+            </table>
+        </div>                          
+
+        <div id="Details" class="tab-content">
+            <h2>Details</h2>
+            <p><strong>Match Night:</strong> <span id="matchNightText">Not available</span></p>
+            <p><strong>Starting Time:</strong> <span id="startingTimeText">Not available</span></p>
+            <p><strong>Venue:</strong> <span id="venueText">Not available</span></p>
+        
+            <!-- Organizer Contact Information -->
+            <h3>Contact Information</h3>
+            <p><strong>Organizer Name:</strong> <span id="organizerNameText">Not available</span></p>
+            <p><strong>Contact Email:</strong> <span id="contactEmailText">Not available</span></p>
+            <p><strong>Phone Number:</strong> <span id="phoneNumberText">Not available</span></p>
+        </div>
+        
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const params = new URLSearchParams(window.location.search);
+                const clubName = params.get('club');
+                const clubNameHeader = document.getElementById('clubNameHeader');
+                const matchNightText = document.getElementById('matchNightText');
+                const startingTimeText = document.getElementById('startingTimeText');
+                const venueText = document.getElementById('venueText');
+                const organizerNameText = document.getElementById('organizerNameText');
+                const contactEmailText = document.getElementById('contactEmailText');
+                const phoneNumberText = document.getElementById('phoneNumberText');
+        
+                // Set the club name in the header
+                clubNameHeader.textContent = clubName;
+        
+                // Get club details from localStorage
+                let clubDetails = JSON.parse(localStorage.getItem('clubDetails')) || {};
+        
+                if (clubDetails[clubName]) {
+                    matchNightText.textContent = clubDetails[clubName].matchNight || 'Not available';
+                    startingTimeText.textContent = clubDetails[clubName].startingTime || 'Not available';
+                    venueText.textContent = clubDetails[clubName].venue || 'Unknown venue';
+                    organizerNameText.textContent = clubDetails[clubName].organizerName || 'Not available';
+                    contactEmailText.textContent = clubDetails[clubName].contactEmail || 'Not available';
+                    phoneNumberText.textContent = clubDetails[clubName].phoneNumber || 'Not available';
+                }
+            });
+        </script>
+
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const params = new URLSearchParams(window.location.search);
+            const clubName = params.get('club');
+            const clubNameHeader = document.getElementById('clubNameHeader');
+            const playersList = document.getElementById('clubPlayersList');
+            const matchesList = document.getElementById('clubMatchesList');
+        
+            // Ensure the club name is set in the header
+            clubNameHeader.textContent = clubName;
+        
+            // Get club details from localStorage
+            let clubDetails = JSON.parse(localStorage.getItem('clubDetails')) || {};
+        
+            if (clubDetails[clubName] && Array.isArray(clubDetails[clubName].players)) {
+                const players = clubDetails[clubName].players;
+                playersList.innerHTML = '';
+        
+                if (players.length > 0) {
+                    players.forEach(player => {
+                        const listItem = document.createElement('li');
+                        const playerLink = document.createElement('a');
+                        playerLink.href = `profile.html?player=${encodeURIComponent(player)}`;
+                        playerLink.textContent = player;
+                        listItem.appendChild(playerLink);
+                        playersList.appendChild(listItem);
+                    });
+                } else {
+                    playersList.innerHTML = '<li>No players in this club.</li>';
+                }
+        
+                // Load matches for this club
+                const matches = clubDetails[clubName].matches || [];
+                matchesList.innerHTML = '';
+        
+                if (matches.length > 0) {
+                    matches.forEach(match => {
+                        const matchElement = document.createElement('div');
+                        matchElement.classList.add('league-match');
+                        matchElement.innerHTML = `
+                            <h4>${match.round}</h4>
+                            <div class="match-info">
+                                <p>${match.team1[0].name} & ${match.team1[1].name} vs ${match.team2[0].name} & ${match.team2[1].name}</p>
+                                <p>Score: ${match.team1[0].scores.join('-')} vs ${match.team2[0].scores.join('-')}</p>
+                            </div>
+                            <p class="match-location">${match.date} | ${match.location}</p>
+                        `;
+                        matchesList.appendChild(matchElement);
+                    });
+                } else {
+                    matchesList.innerHTML = '<p>No matches found for this club.</p>';
+                }
+            } else {
+                playersList.innerHTML = '<li>No players found for this club.</li>';
+            }
+        
+            // Automatically open the Overview tab by default
+            document.getElementsByClassName('tablinks')[0].click();
+        });
+        </script>
+    </div>
+
+    <script>
+        // Tab switching logic
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            tablinks = document.getElementsByClassName("tablinks");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
+        }
+
+        // Load club data from localStorage
+        document.addEventListener('DOMContentLoaded', function() {
+            const params = new URLSearchParams(window.location.search);
+            const clubName = params.get('club');
+            const clubNameHeader = document.getElementById('clubNameHeader');
+            const playersList = document.getElementById('clubPlayersList');
+
+            // Ensure the club name is set in the header
+            clubNameHeader.textContent = clubName;
+
+            // Get club details from localStorage
+            let clubDetails = JSON.parse(localStorage.getItem('clubDetails')) || {};
+
+            if (clubDetails[clubName] && Array.isArray(clubDetails[clubName].players)) {
+                // Get the players for this club
+                const players = clubDetails[clubName].players;
+
+                // Clear the current list
+                playersList.innerHTML = '';
+
+                if (players.length > 0) {
+                    // Add each player as a link to their profile
+                    players.forEach(player => {
+                        const listItem = document.createElement('li');
+                        const playerLink = document.createElement('a');
+                        playerLink.href = `profile.html?player=${encodeURIComponent(player)}`;
+                        playerLink.textContent = player;
+                        listItem.appendChild(playerLink);
+                        playersList.appendChild(listItem);
+                    });
+                } else {
+                    playersList.innerHTML = '<li>No players in this club.</li>';
+                }
+            } else {
+                playersList.innerHTML = '<li>No players found for this club.</li>';
+            }
+
+            // Automatically open the Overview tab by default
+            document.getElementsByClassName('tablinks')[0].click();
+        });
+    </script>
+        <script src="script.js"></script>
+</body>
+</html>

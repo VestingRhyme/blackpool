@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clubs</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+        <!-- clubs.html -->
+    <div class="container">
+        <h1>Clubs</h1>
+        <div class="dropdown">
+            <button class="dropbtn">Navigate</button>
+            <div class="dropdown-content">
+                <a href="clubs.html">Clubs</a>
+                <a href="ranking.html">Ranking</a>
+                <a href="players.html">Players</a>
+                <a href="tournaments.html">Tournaments</a>
+                <a href="fixture.html">Fixtures</a>
+            </div>
+        </div>
+
+        <!-- Clubs Table -->
+        <table id="clubsTable" class="leaderboardTable">
+            <thead>
+                <tr>
+                    <th>Club Name</th>
+                    <th>Number of Players</th>
+                </tr>
+            </thead>
+            <tbody id="clubsTableBody">
+                <!-- Clubs will be dynamically added here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Function to load clubs from localStorage and display them in the clubs table
+        function loadClubs() {
+            const clubsTableBody = document.getElementById('clubsTableBody');
+            clubsTableBody.innerHTML = '';  // Clear any existing rows
+
+            // Retrieve club details from localStorage
+            const clubDetails = JSON.parse(localStorage.getItem('clubDetails')) || {};
+
+            if (Object.keys(clubDetails).length === 0) {
+                clubsTableBody.innerHTML = '<tr><td colspan="2">No clubs found.</td></tr>';
+                return;
+            }
+
+            // Loop through the clubs and create rows in the table
+            Object.keys(clubDetails).forEach(clubName => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><a href="club-profile.html?club=${encodeURIComponent(clubName)}">${clubName}</a></td>
+                    <td>${Object.keys(clubDetails[clubName].players || {}).length}</td>
+                `;
+                clubsTableBody.appendChild(row);
+            });
+        }
+
+        // Load clubs on page load
+        loadClubs();
+    });
+    </script>
+    
+
+      
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Draw Profile</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Override link colors for matches */
+        #matchesTable a {
+            color: black;
+            text-decoration: none;
+        }
+        #matchesTable a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 id="drawNameHeader">Draw Profile</h1>
+        <p><strong>Tournament:</strong> <span id="tournamentName"></span></p>
+
+        <h2>Players in Draw</h2>
+        <ul id="drawPlayersList"></ul>
+
+        <h2>Matches</h2>
+        <table id="matchesTable" class="matches-table">
+            <thead>
+                <tr>
+                    <th>Matches</th>
+                    <th>Score</th>
+                </tr>
+            </thead>
+            <tbody id="matchesTableBody"></tbody>
+        </table>
+
+        <a href="tournament-profile.html" id="backToTournament">Back to Tournament Profile</a>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const drawName = urlParams.get('draw');
+            const tournamentName = urlParams.get('tournament');
+
+            const tournaments = JSON.parse(localStorage.getItem('tournaments')) || [];
+            const tournament = tournaments.find(t => t.name === tournamentName);
+
+            if (!tournament || !tournament.draws) {
+                alert('Invalid tournament or draw');
+                window.location.href = 'tournament-profile.html';
+                return;
+            }
+
+            const draw = tournament.draws.find(d => d.name === drawName);
+            if (!draw) {
+                alert('Draw not found');
+                window.location.href = 'tournament-profile.html';
+                return;
+            }
+
+            document.getElementById('drawNameHeader').textContent = drawName;
+            document.getElementById('tournamentName').textContent = tournamentName;
+            document.getElementById('backToTournament').href = `tournament-profile.html?tournament=${encodeURIComponent(tournamentName)}`;
+
+            const drawPlayersList = document.getElementById('drawPlayersList');
+            const matchesTableBody = document.getElementById('matchesTableBody');
+
+            // Populate players
+            if (draw.players.length > 0) {
+                draw.players.forEach(player => {
+                    const listItem = document.createElement('li');
+                    const playerLink = document.createElement('a');
+                    playerLink.href = `profile.html?player=${encodeURIComponent(player)}`;
+                    playerLink.textContent = player;
+                    playerLink.target = '_blank';
+                    listItem.appendChild(playerLink);
+                    drawPlayersList.appendChild(listItem);
+                });
+            } else {
+                drawPlayersList.innerHTML = '<p>No players in this draw.</p>';
+            }
+
+            // Populate matches
+            if (draw.matches.length > 0) {
+                matchesTableBody.innerHTML = ''; // Clear previous matches
+                draw.matches.forEach(match => {
+                    const row = document.createElement('tr');
+
+                    // Match column
+                    const matchCell = document.createElement('td');
+                    matchCell.innerHTML = `
+                        <a href="profile.html?player=${encodeURIComponent(match.team1)}" target="_blank">${match.team1}</a> - 
+                        <a href="profile.html?player=${encodeURIComponent(match.team2)}" target="_blank">${match.team2}</a>
+                    `;
+                    row.appendChild(matchCell);
+
+                    // Score column
+                    const scoreCell = document.createElement('td');
+                    scoreCell.textContent = match.score ? match.score : '';
+                    row.appendChild(scoreCell);
+
+                    matchesTableBody.appendChild(row);
+                });
+            } else {
+                matchesTableBody.innerHTML = '<tr><td colspan="2">No matches scheduled for this draw.</td></tr>';
+            }
+        });
+    </script>
+</body>
+</html>

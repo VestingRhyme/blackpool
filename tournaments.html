@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tournaments</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Tournaments</h1>
+        <div class="dropdown">
+            <button class="dropbtn">Navigate</button>
+            <div class="dropdown-content">
+                <a href="clubs.html">Clubs</a>
+                <a href="ranking.html">Ranking</a>
+                <a href="players.html">Players</a>
+                <a href="tournaments.html">Tournaments</a>
+                <a href="fixture.html">Fixtures</a>
+            </div>
+        </div>
+
+        <!-- Upcoming Tournaments -->
+        <h2>Upcoming Tournaments</h2>
+        <table id="tournamentsTable" class="leaderboardTable">
+            <thead>
+                <tr>
+                    <th>Tournament Name</th>
+                    <th>Location</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody id="tournamentsTableBody">
+                <!-- Upcoming tournaments data will be injected here -->
+            </tbody>
+        </table>
+
+        <!-- Past Tournaments -->
+        <h2>Past Tournaments</h2>
+        <table id="pastTournamentsTable" class="leaderboardTable">
+            <thead>
+                <tr>
+                    <th>Tournament Name</th>
+                    <th>Location</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody id="pastTournamentsTableBody">
+                <!-- Past tournaments data will be injected here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const tournaments = JSON.parse(localStorage.getItem('tournaments')) || [];
+            const tournamentsTableBody = document.getElementById('tournamentsTableBody');
+            const pastTournamentsTableBody = document.getElementById('pastTournamentsTableBody');
+
+            function displayTournaments() {
+                const today = new Date();
+                tournamentsTableBody.innerHTML = '';
+                pastTournamentsTableBody.innerHTML = '';
+
+                tournaments.forEach((tournament) => {
+                    const tournamentDate = new Date(tournament.date);
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><a href="tournament-profile.html?tournament=${encodeURIComponent(tournament.name)}">${tournament.name}</a></td>
+                        <td>${tournament.location}</td>
+                        <td>${tournament.date}</td>
+                    `;
+
+                    if (tournamentDate >= today) {
+                        tournamentsTableBody.appendChild(row);
+                    } else {
+                        pastTournamentsTableBody.appendChild(row);
+                    }
+                });
+            }
+
+            displayTournaments();
+        });
+    </script>
+
+    <script src="script.js"></script>
+</body>
+</html>

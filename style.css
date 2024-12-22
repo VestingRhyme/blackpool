@@ -1,0 +1,569 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+.container {
+    width: 80%;
+    margin: 0 auto;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    color: #d72638;
+    text-align: center;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+}
+
+a {
+    color: #d72638;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.profile-header {
+    display: flex;
+    align-items: center;
+}
+
+.profile-pic {
+    margin-right: 20px;
+}
+
+.avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: #d72638;
+    color: white;
+    font-size: 36px;
+    line-height: 80px;
+    text-align: center;
+}
+
+.profile-info p {
+    margin: 5px 0;
+}
+
+.profile-stats h2 {
+    margin-top: 30px;
+    color: #d72638;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 10px;
+    background-color: #ddd;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.progress {
+    height: 100%;
+    background-color: #76c7c0; /* Default color, overwritten inline */
+}
+
+.stats-history h3 {
+    margin-top: 20px;
+}
+
+/* Tab styles */
+.tabs {
+    display: flex;
+    margin-top: 20px;
+    border-bottom: 2px solid #ddd;
+}
+
+.tab-link {
+    padding: 10px 20px;
+    cursor: pointer;
+    background-color: #f1f1f1;
+    border: none;
+    outline: none;
+    transition: background-color 0.3s;
+}
+
+.tab-link.active {
+    background-color: #ddd;
+    border-bottom: 2px solid #f30000;
+}
+
+.tab-content {
+    display: none;
+    margin-top: 20px;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Styles for the League Tab */
+.league-match {
+    margin: 20px 0;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.league-match h4 {
+    margin: 0;
+    font-weight: bold;
+    color: #333;
+}
+
+/* Styles for the League Tab */
+.league-match {
+    margin: 20px 0;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.league-match h4 {
+    margin: 0;
+    font-weight: bold;
+    color: #333;
+}
+
+.league-match p {
+    margin: 5px 0;
+    color: #555;
+}
+
+.match-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.team {
+    flex: 1;
+    margin-right: 10px;
+}
+
+.player-score {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 5px 0;
+}
+
+.player-score p {
+    flex: 1;
+    margin: 0;
+    font-weight: bold;
+}
+
+.score-list {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px; /* Adds space between the scores */
+}
+
+.score-list span {
+    display: inline-block;
+    min-width: 20px; /* Ensures consistent width for scores */
+    text-align: center;
+}
+
+.team hr {
+    border: 0;
+    border-top: 1px solid #ddd;
+    margin: 10px 0;
+}
+
+.match-location {
+    font-size: 0.9em;
+    color: #777;
+    text-align: center;
+}
+
+.match-item {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.match-item h4 {
+    margin-top: 0;
+}
+
+.match-item p {
+    margin: 5px 0;
+}
+
+button.save-match-button, button.delete-match-button {
+    margin-top: 5px;
+}
+.stats-tabs {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 15px;
+}
+
+.stats-tab-link {
+    padding: 10px 20px;
+    border: 1px solid #ccc;
+    background-color: #f4f4f4;
+    cursor: pointer;
+    margin-right: 5px;
+}
+
+.stats-tab-link.active {
+    background-color: #e60000;
+    color: white;
+}
+
+.stats-content {
+    display: none;
+}
+
+.stats-content.active {
+    display: block;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 10px;
+    background-color: #ddd;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-top: 10px;
+}
+
+.progress-bar .progress {
+    height: 100%;
+    background-color: #4caf50;
+    transition: width 0.4s ease;
+}
+
+#searchInput {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    font-size: 16px;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+}
+
+/* Dropdown Container */
+.dropdown {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 20px;
+}
+
+/* Dropdown Button */
+.dropbtn {
+    background-color: #d72638;
+    color: white;
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+}
+
+/* Dropdown Content (hidden by default) */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f1f1f1;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+/* Change color of dropdown links on hover */
+.dropdown-content a:hover {
+    background-color: #ddd;
+}
+
+/* Show the dropdown menu on hover */
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* Change the background color of the dropdown button when the dropdown content is shown */
+.dropdown:hover .dropbtn {
+    background-color: #c22e2e;
+}
+/* Tabbed navigation styles */
+.tabs {
+    overflow: hidden;
+    background-color: #f1f1f1;
+    border-bottom: 1px solid #ccc;
+}
+
+.tablink {
+    background-color: #f1f1f1;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: 0.3s;
+    font-size: 17px;
+}
+
+.tablink:hover {
+    background-color: #ddd;
+}
+
+.tablink.active {
+    background-color: #d72638;
+    color: white;
+}
+
+.tabcontent {
+    display: none;
+    padding: 20px;
+    border-top: none;
+}
+
+.tabcontent.active {
+    display: block;
+}
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1, h2 {
+    color: #d72638;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    margin-bottom: 10px;
+}
+
+p {
+    font-size: 1.1em;
+    line-height: 1.5;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+}
+
+.leaderboardTable th {
+    background-color: #f1f1f1;
+    font-weight: bold;
+}
+
+.leaderboardTable tbody tr:nth-child(odd) {
+    background-color: #f9f9f9;
+}
+
+/* Tabs Styling */
+.tabs {
+    display: flex;
+    margin-top: 20px;
+    border-bottom: 2px solid #ddd;
+}
+
+.tab-link {
+    padding: 10px 20px;
+    cursor: pointer;
+    background-color: #f1f1f1;
+    border: none;
+    outline: none;
+    transition: background-color 0.3s ease;
+    flex: 1;
+    text-align: center;
+}
+
+.tab-link.active {
+    background-color: #ddd;
+    border-bottom: 2px solid #d72638;
+}
+
+.tab-content {
+    display: none;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 4px;
+    margin-top: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Tab Navigation */
+.tabs {
+    display: flex;
+    border-bottom: 2px solid #ddd;
+    margin-top: 20px;
+}
+
+.tab-link {
+    padding: 10px 20px;
+    cursor: pointer;
+    background-color: #f1f1f1;
+    border: none;
+    outline: none;
+    transition: background-color 0.3s;
+}
+
+.tab-link.active {
+    background-color: #ddd;
+    border-bottom: 2px solid #d72638;
+}
+
+.tab-content {
+    display: none;
+    margin-top: 20px;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Group Header Style */
+.group-header {
+    font-weight: bold;
+    font-size: 1.2em;
+    color: #333;
+    background-color: #f9f9f9;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    margin-top: 15px;
+}
+
+/* Player Container Style */
+.player-container {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 15px;
+    border-bottom: 1px solid #ddd;
+}
+
+.player-name {
+    font-weight: bold;
+    color: rgb(0, 0, 0); /* Red color for names */
+}
+
+.player-location {
+    color: #666; /* Gray color for locations */
+    font-size: 0.9em;
+}
+
+#tournamentMatches li {
+    background-color: #f9f9f9;
+    padding: 10px;
+    margin-bottom: 8px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+}
+
+#tournamentMatches li strong {
+    font-size: 1.1em;
+    color: #333;
+}
+
+#tournamentMatches li em {
+    font-weight: bold;
+    color: #007bff;
+}
+
+.match-item {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 10px;
+    font-size: 0.9em; /* Smaller font for player names */
+    text-align: center;
+}
+
+.match-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.team-display {
+    margin-bottom: 4px;
+    text-align: center;
+}
+
+.player-name {
+    margin: 2px 0;
+}
+
+.versus {
+    font-weight: bold;
+    opacity: 0.6; /* Slight transparency */
+    margin: 4px 0;
+}
+
+.matches-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.match-card {
+    background-color: #fff;
+    padding: 6px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.team-name {
+    font-weight: bold;
+    font-size: 1.0em;
+    margin: 5px 0;
+}
+
+.match-score {
+    font-size: 1.0em;
+    font-weight: bold;
+    color: #d72638;
+    margin-top: 5px;
+}

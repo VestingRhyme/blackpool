@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player Profile</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1 id="playerNameHeader" class="centered-text">Player Name</h1>
+        
+        <div class="profile-header">
+            <div class="profile-pic">
+                <div class="avatar" id="avatarInitials">[Initials]</div>
+            </div>
+            <div class="profile-info">
+                <p>Club: <a id="clubLink" href="#">No club</a></p> <!-- Changed the span to an anchor -->
+            </div>            
+        </div>
+        
+        <!-- Tab Navigation -->
+        <div class="tabs">
+            <button class="tab-link active" data-tab="overview">Overview</button>
+            <button class="tab-link" data-tab="tournaments">Tournaments</button>
+            <button class="tab-link" data-tab="league">League</button>
+            <button class="tab-link" data-tab="ranking">Ranking</button>
+        </div>
+
+        <!-- Tab Content -->
+        <div id="overview" class="tab-content active">
+            <div class="profile-stats">
+                <h2>Statistics</h2>
+                <div class="stats-section">
+                    <h3>Total</h3>
+                    <p>Win-Loss: 
+                        <span id="gamesWonText">0</span> / 
+                        <span id="totalGamesText">0</span> 
+                        (<span id="winPercentageText">0%</span>)
+                    </p>
+                    <div class="progress-bar">
+                        <div class="progress" style="width: 0%;"></div>
+                    </div>                    
+                </div>
+            </div>
+        </div>
+
+        <div id="tournaments" class="tab-content">
+            <h2>Past Tournaments</h2>
+            <div id="tournamentsList">
+                <!-- Tournaments will be loaded here -->
+            </div>
+        </div>
+        
+        <div id="league" class="tab-content">
+            <h2>Past League Matches</h2>
+            <div id="leagueMatches">
+                <!-- League matches will be loaded here -->
+            </div>
+        </div>
+        
+        <div id="ranking" class="tab-content">
+            <h2>Player Ranking</h2>
+            <p id="rankingInfo">Rank: Loading...</p>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const params = new URLSearchParams(window.location.search);
+            const playerName = params.get('player');
+            if (playerName) {
+                document.getElementById('playerNameHeader').textContent = decodeURIComponent(playerName);
+            }
+        });
+
+    </script>
+
+    <script src="script.js"></script>
+</body>
+</html>

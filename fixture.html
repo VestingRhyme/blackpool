@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fixtures</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    
+    <h1>Upcoming Fixtures</h1>
+
+    <div class="dropdown">
+        <button class="dropbtn">Navigate</button>
+        <div class="dropdown-content">
+            <a href="clubs.html">Clubs</a>
+            <a href="ranking.html">Ranking</a>
+            <a href="players.html">Players</a>
+            <a href="tournaments.html">Tournaments</a>
+            <a href="fixture.html">Fixtures</a>
+        </div>
+    </div>
+
+    <!-- Table to display upcoming fixtures -->
+    <table id="fixturesTable" class="leaderboardTable">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Home Team</th>
+                <th>Away Team</th>
+                <th>Venue</th>
+            </tr>
+        </thead>
+        <tbody id="fixturesList">
+            <!-- Fixtures will be dynamically added here -->
+        </tbody>
+    </table>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const fixturesList = document.getElementById('fixturesList');
+
+            // Get fixtures from localStorage
+            let fixtures = JSON.parse(localStorage.getItem('fixtures')) || [];
+
+            if (fixtures.length > 0) {
+                fixturesList.innerHTML = '';
+                fixtures.forEach(fixture => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${fixture.date}</td>
+                        <td>${fixture.team1}</td>
+                        <td>${fixture.team2}</td>
+                        <td>${fixture.venue}</td>
+                    `;
+                    fixturesList.appendChild(row);
+                });
+            } else {
+                fixturesList.innerHTML = '<tr><td colspan="4">No upcoming fixtures found.</td></tr>';
+            }
+        });
+    </script>
+</body>
+</html>
